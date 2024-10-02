@@ -3,21 +3,30 @@ import { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import RichText from './RichText';
 import NotionParser from '.';
 import TableRow from './TableRow';
+import { getChildBlocks } from './utils';
+import { OptionsContext } from './contexts';
 
 export type NotionBlockProps = {
   block: BlockObjectResponse;
   blocks: BlockObjectResponse[];
-  childBlocks: BlockObjectResponse[];
 };
 
-const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
+const NotionBlock: FC<NotionBlockProps> = ({ block, blocks }) => {
+  const { custom, classMap } = React.useContext(OptionsContext);
   const { type } = block;
+
+  if (custom) {
+    const customBlock = custom(block, blocks);
+    if (customBlock) {
+      return customBlock
+    }
+  }
 
   if (type === 'paragraph') {
     const content = block.paragraph.rich_text.map((rT) => (
       <RichText richText={rT} />
     ));
-    return <p>{content}</p>;
+    return <p className={classMap?.paragraph}>{content}</p>;
   }
 
   if (type === 'heading_1') {
@@ -28,7 +37,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
     const style: React.CSSProperties = {
       color: color !== 'default' ? color : undefined,
     };
-    return <h1 style={style}>{content}</h1>;
+    return <h1 style={style} className={classMap?.heading_1}>{content}</h1>;
   }
 
   if (type === 'heading_2') {
@@ -39,7 +48,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
     const style: React.CSSProperties = {
       color: color !== 'default' ? color : undefined,
     };
-    return <h2 style={style}>{content}</h2>;
+    return <h2 style={style} className={classMap?.heading_2}>{content}</h2>;
   }
 
   if (type === 'heading_3') {
@@ -50,7 +59,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
     const style: React.CSSProperties = {
       color: color !== 'default' ? color : undefined,
     };
-    return <h3 style={style}>{content}</h3>;
+    return <h3 style={style} className={classMap?.heading_3}>{content}</h3>;
   }
 
   if (type === 'bulleted_list_item') {
@@ -76,13 +85,15 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
 
   if (type === 'table') {
     const { has_column_header, has_row_header } = block.table;
+    const childBlocks = getChildBlocks(block.id, blocks);
 
     return (
-      <table>
+      <table className={classMap?.table}>
         <tbody>
           {childBlocks.map((child, index) => (
             <TableRow
               key={index}
+              className={classMap?.table_row}
               block={child}
               index={index}
               hasColumnHeader={has_column_header}
@@ -103,6 +114,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
   }
 
   if (type === 'toggle') {
+    const childBlocks = getChildBlocks(block.id, blocks);
     const children = childBlocks.map((child) => (
       <NotionParser data={{ rootId: child.id, blocks }} />
     ));
@@ -126,7 +138,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks, childBlocks }) => {
       <RichText richText={rT} />
     ));
     return (
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex' }} className={classMap?.callout}>
         <div>
           {icon?.type === 'emoji' && <span>{icon.emoji}</span>}
         </div>

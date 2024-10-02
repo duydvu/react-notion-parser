@@ -3,13 +3,14 @@ import { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import RichText from './RichText';
 
 export type TableRowProps = {
+  className?: string;
   block: BlockObjectResponse;
   index: number;
   hasColumnHeader: boolean;
   hasRowHeader: boolean;
 };
 
-const TableRow: FC<TableRowProps> = ({ block, index, hasColumnHeader, hasRowHeader }) => {
+const TableRow: FC<TableRowProps> = ({ className, block, index, hasColumnHeader, hasRowHeader }) => {
   const { type } = block;
 
   if (type === 'table_row') {
@@ -25,7 +26,7 @@ const TableRow: FC<TableRowProps> = ({ block, index, hasColumnHeader, hasRowHead
       return <td key={colIndex}>{content}</td>;
     });
 
-    return <tr>{cells}</tr>;
+    return <tr className={className}>{cells}</tr>;
   }
 
   return null;
