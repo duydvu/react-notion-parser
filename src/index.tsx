@@ -36,8 +36,7 @@ const NotionParser: FC<NotionParserProps> = ({ className, data, options }) => {
   );
 }
 
-export default NotionParser;
-
 export {
+  NotionParser,
   NotionBlock,
 }

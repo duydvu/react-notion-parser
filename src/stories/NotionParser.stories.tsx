@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
-import NotionParser from '..';
+import { NotionParser } from '..';
 
 import BasicData from './basic.json';
 

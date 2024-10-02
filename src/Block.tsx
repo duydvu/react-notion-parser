@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import RichText from './RichText';
-import NotionParser from '.';
 import TableRow from './TableRow';
 import { getChildBlocks } from './utils';
 import { OptionsContext } from './contexts';
@@ -66,21 +65,21 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks }) => {
     const content = block.bulleted_list_item.rich_text.map((rT) => (
       <RichText richText={rT} />
     ));
-    return <li>{content}</li>;
+    return <li className={classMap?.bulleted_list_item}>{content}</li>;
   }
 
   if (type === 'numbered_list_item') {
     const content = block.numbered_list_item.rich_text.map((rT) => (
       <RichText richText={rT} />
     ));
-    return <li>{content}</li>;
+    return <li className={classMap?.numbered_list_item}>{content}</li>;
   }
 
   if (type === 'quote') {
     const content = block.quote.rich_text.map((rT) => (
       <RichText richText={rT} />
     ));
-    return <blockquote>{content}</blockquote>;
+    return <blockquote className={classMap?.quote}>{content}</blockquote>;
   }
 
   if (type === 'table') {
@@ -109,16 +108,16 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks }) => {
     const { type } = block.image;
     if (type === 'external') {
       const { external } = block.image;
-      return <img src={external.url} alt={external.url} />;
+      return <img src={external.url} alt={external.url} className={classMap?.image} />;
     }
   }
 
   if (type === 'toggle') {
     const childBlocks = getChildBlocks(block.id, blocks);
     const children = childBlocks.map((child) => (
-      <NotionParser data={{ rootId: child.id, blocks }} />
+      <NotionBlock key={child.id} block={child} blocks={blocks} />
     ));
-    return <details>{children}</details>;
+    return <details className={classMap?.toggle}>{children}</details>;
   }
 
   if (type === 'divider') {
@@ -129,7 +128,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks }) => {
     const content = block.code.rich_text.map((rT) => (
       <RichText richText={rT} />
     ));
-    return <pre>{content}</pre>;
+    return <pre className={classMap?.code}>{content}</pre>;
   }
 
   if (type === 'callout') {
@@ -152,7 +151,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks }) => {
   if (type === 'bookmark') {
     const { bookmark } = block;
     return (
-      <a href={bookmark.url} target="_blank" rel="noreferrer">
+      <a href={bookmark.url} target="_blank" rel="noreferrer" className={classMap?.bookmark}>
         {bookmark.url}
       </a>
     );
@@ -161,7 +160,7 @@ const NotionBlock: FC<NotionBlockProps> = ({ block, blocks }) => {
   if (type === 'link_preview') {
     const { link_preview } = block;
     return (
-      <a href={link_preview.url} target="_blank" rel="noreferrer">
+      <a href={link_preview.url} target="_blank" rel="noreferrer" className={classMap?.link_preview}>
         {link_preview.url}
       </a>
     );
